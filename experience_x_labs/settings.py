@@ -14,7 +14,6 @@ from datetime import timedelta
 from dotenv import load_dotenv
 
 from pathlib import Path
-load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -133,8 +132,8 @@ REST_FRAMEWORK = {
 
 }
 
-ACCESS_TOKEN_LIFETIME_MINUTES = int(os.getenv('ACCESS_TOKEN_LIFETIME_MINUTES'))
-REFRESH_TOKEN_LIFETIME_DAYS = int(os.getenv('REFRESH_TOKEN_LIFETIME_DAYS'))
+ACCESS_TOKEN_LIFETIME_MINUTES = 15
+REFRESH_TOKEN_LIFETIME_DAYS = 15
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=ACCESS_TOKEN_LIFETIME_MINUTES),

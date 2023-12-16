@@ -93,7 +93,15 @@ DATABASES = {
         'PASSWORD': 'dEx8u!Ds2GRT$O',
         'HOST': '34.234.180.111',
         'PORT': '5432',
-    }
+    },
+    'second_db': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'bkg_rm_db',
+        'USER': 'postgres',
+        'PASSWORD': 'dEx8u!Ds2GRT$O',
+        'HOST': '34.234.180.111',
+        'PORT': '5432',
+    },
 }
 
 
@@ -164,3 +172,4 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DATABASE_ROUTERS = ['experience_x_labs.bkg_rm_db_router.SecondDBRouter']

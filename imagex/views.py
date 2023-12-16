@@ -86,7 +86,7 @@ class AccountAPIView(APIView):
         try:
             status_param = request.query_params.get('account_status', None)
             account_status = status_param.lower() == 'true' if status_param is not None else None
-            account_objs = Accounting.objects.filter(client_id=client_id)
+            account_objs = Accounting.objects.using('second_db').filter(client_id=client_id)
             account_objs = account_objs.filter(status=account_status)
             status_count = account_objs.count()
             serializer = AccountingSerializer(account_objs, many=True)

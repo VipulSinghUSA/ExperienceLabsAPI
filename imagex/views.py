@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import UserloginExp, ClientPkg, Accounting
+from .models import UserloginExp, ClientPkg, Accounting, ClientContact, Client
 from common.rest_utils import build_response
 
 class UserLoginAPIView(APIView):
@@ -17,11 +17,13 @@ class UserLoginAPIView(APIView):
         password = serializer.validated_data['password']
 
         try:
-            user = UserloginExp.objects.get(email=email)
+            breakpoint()
+            user = UserloginExp.objects.using('default').get(email=email)
             refresh = RefreshToken.for_user(user)
-            client_contact = user.client_contact
+            client_contact_id = user.client_contact_id
 
-            client = client_contact.clientid
+            client_contact = ClientContact.objects.using('default').get(id=client_contact_id)
+            client = Client.objects.using('default').get(id= client_contact.clientid_id)
             if client:
                 client_data = {
                     'id': client.id,

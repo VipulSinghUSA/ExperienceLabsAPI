@@ -136,7 +136,6 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 class UserloginExp(models.Model):
-    id = models.IntegerField(primary_key=True)
     email = models.TextField(blank=True, null=True)
     password = models.TextField(blank=True, null=True)
     client_contact = models.ForeignKey(ClientContact, models.DO_NOTHING, blank=True, null=True)
@@ -152,6 +151,9 @@ class UserloginExp(models.Model):
 
     def __str__(self):
         return self.email
+
+    # class Meta:
+    #     db_table = 'imagex_userloginexp'
 
     class Meta:
         # managed = False

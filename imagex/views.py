@@ -17,7 +17,7 @@ class UserLoginAPIView(APIView):
         password = serializer.validated_data['password']
 
         try:
-           
+
             user = UserloginExp.objects.using('default').get(email=email)
             refresh = RefreshToken.for_user(user)
             client_contact_id = user.client_contact_id
@@ -68,7 +68,7 @@ class ClientPkgAPIView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request, client_id, *args, **kwargs):
         try:
-            client_packages = ClientPkg.objects.filter(client_id=client_id)
+            client_packages = ClientPkg.objects.using('default').filter(client_id=client_id)
             serializer = ClientPkgSerializer(client_packages, many=True)
             return build_response(
                 status.HTTP_200_OK,

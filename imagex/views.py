@@ -17,7 +17,6 @@ class UserLoginAPIView(APIView):
         password = serializer.validated_data['password']
 
         try:
-            breakpoint()
             user = UserloginExp.objects.using('default').get(email=email)
             refresh = RefreshToken.for_user(user)
             client_contact_id = user.client_contact_id

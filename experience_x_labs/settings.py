@@ -28,6 +28,7 @@ SECRET_KEY = 'django-insecure-5*-ooh1(^(9h@h$l4xssf#4dr=^1sw+4*ij2)p@jera@^gbhl#
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
+AUTH_USER_MODEL = 'account.UserloginExp'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",
 ]
@@ -38,11 +39,17 @@ CORS_ORIGIN_WHITELIST = [
     "http://localhost:4200"
 ]
 
-
-# Application definition
-
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+CORS_ALLOW_CREDENTIALS = True
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -52,6 +59,7 @@ INSTALLED_APPS = [
     'rest_framework',
     "rest_framework_simplejwt",
     'corsheaders',
+    "account"
 
 ]
 
@@ -96,8 +104,33 @@ WSGI_APPLICATION = 'experience_x_labs.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+#
+# DATABASE_ROUTERS = ['experience_x_labs.bkg_rm_db_router.AuthRouter' ]
+#
+#
+# DATABASES = {
+#     'default': {},
+#     'imagex_db': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'imagexdev',
+#         'USER': 'postgres',
+#         'PASSWORD': 'dEx8u!Ds2GRT$O',
+#         'HOST': '34.234.180.111',
+#         'PORT': '5432',
+#     },
+#     'second_db': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'bkg_rm_db',
+#         'USER': 'postgres',
+#         'PASSWORD': 'dEx8u!Ds2GRT$O',
+#         'HOST': '34.234.180.111',
+#         'PORT': '5432',
+#     },
+# }
+
 
 DATABASES = {
+    # 'default': {},
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'imagexdev',
@@ -115,6 +148,10 @@ DATABASES = {
         'PORT': '5432',
     },
 }
+
+DATABASE_ROUTERS = ['experience_x_labs.bkg_rm_db_router.ListingRouter', 'experience_x_labs.bkg_rm_db_router.ImagexRouter']
+
+# DATABASE_ROUTERS = ['user.router.AuthRouter', 'listing.router.ListingRouter']
 
 
 # DATABASES = {
@@ -184,4 +221,3 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-DATABASE_ROUTERS = ['experience_x_labs.bkg_rm_db_router.SecondDBRouter']

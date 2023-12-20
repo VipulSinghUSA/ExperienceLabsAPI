@@ -1,42 +1,83 @@
-class SecondDBRouter:
-    """
-    A router to control all database operations on models in the
-    imagex application.
-    """
+# class AuthRouter:
+#     route_app_labels = {'account'}
+
+#     def db_for_read(self, model, **hints):
+#         if model._meta.app_label in self.route_app_labels:
+#             return 'imagex_db'
+#         return None
+
+#     def db_for_write(self, model, **hints):
+#         if model._meta.app_label in self.route_app_labels:
+#             return 'imagex_db'
+#         return None
+
+#     def allow_relation(self, obj1, obj2, **hints):
+#         if (
+#             obj1._meta.app_label in self.route_app_labels or 
+#             obj2._meta.app_label in self.route_app_labels
+#         ):
+#             return True
+#         return None
+
+#     def allow_migrate(self, db, app_label, model_name=None, **hints):
+#         if app_label in self.route_app_labels:
+#             return db == 'imagex_db'
+#         return None
+
+
+class ListingRouter:
+    route_app_labels = {'account'}
 
     def db_for_read(self, model, **hints):
-        """
-        Point all operations on models in the imagex application to the 'second_db' database.
-        """
-        if model._meta.app_label == 'imagex':
-            return 'second_db'
+        if model._meta.app_label in self.route_app_labels:
+            return 'default'
         return None
 
     def db_for_write(self, model, **hints):
-        """
-        Point all operations on models in the imagex application to the 'second_db' database.
-        """
-        if model._meta.app_label == 'imagex':
-            return 'second_db'
+        if model._meta.app_label in self.route_app_labels:
+            return 'default'
         return None
 
     def allow_relation(self, obj1, obj2, **hints):
-        """
-        Allow relations between objects in the imagex application.
-        """
         if (
-            obj1._meta.app_label == 'imagex'
-            or
-            obj2._meta.app_label == 'imagex'
+            obj1._meta.app_label in self.route_app_labels or
+            obj2._meta.app_label in self.route_app_labels
         ):
             return True
         return None
 
     def allow_migrate(self, db, app_label, model_name=None, **hints):
-        """
-        Make sure the 'second_db' database only appears in the 'imagex'
-        application.
-        """
-        if app_label == 'imagex':
+        if app_label in self.route_app_labels:
+            return db == 'default'
+        return None
+
+
+
+
+
+class ImagexRouter:
+    route_app_labels = {'imagex'}
+
+    def db_for_read(self, model, **hints):
+        if model._meta.app_label in self.route_app_labels:
+            return 'second_db'
+        return None
+
+    def db_for_write(self, model, **hints):
+        if model._meta.app_label in self.route_app_labels:
+            return 'second_db'
+        return None
+
+    def allow_relation(self, obj1, obj2, **hints):
+        if (
+            obj1._meta.app_label in self.route_app_labels or
+            obj2._meta.app_label in self.route_app_labels
+        ):
+            return True
+        return None
+
+    def allow_migrate(self, db, app_label, model_name=None, **hints):
+        if app_label in self.route_app_labels:
             return db == 'second_db'
         return None
+

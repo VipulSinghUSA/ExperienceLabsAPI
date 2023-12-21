@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions, status
 from common.rest_utils import build_response
-from .models import UserloginExp,ClientContact,ClientExplabs,Location,Client,Country
+from .models import UserloginExp,ClientContact,ClientExplabs,Location,Client,Country,ClientPkg
 from .serializers import ClientExplabsSerializer,LocationSerializer,LoginSerializer,ClientPkgSerializer,UserloginExpSerializer,CountrySerializer
 import requests
 import json
@@ -182,7 +182,7 @@ class ClientPkgAPIView(APIView):
 
     def get(self, request, client_id, *args, **kwargs):
         try:
-            client_packages = ClientPkg.objects.using('default').filter(client_id=client_id)
+            client_packages = ClientPkg.objects.filter(client_id=client_id)
             serializer = ClientPkgSerializer(client_packages, many=True)
             return build_response(
                 status.HTTP_200_OK,

@@ -185,9 +185,13 @@ AUTH_PASSWORD_VALIDATORS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ],
 
 }
+
+
 
 ACCESS_TOKEN_LIFETIME_MINUTES = 15
 REFRESH_TOKEN_LIFETIME_DAYS = 15

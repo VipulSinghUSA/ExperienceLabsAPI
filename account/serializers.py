@@ -1,10 +1,15 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
-from .models import ClientExplabs,Location,ClientContact,ClientPkg
+from .models import ClientExplabs,Location,ClientContact,ClientPkg,UserloginExp
 
 User = get_user_model()
 
+
+class UserloginExpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserloginExp
+        fields = '__all__'
 
 class ClientExplabsSerializer(serializers.ModelSerializer):
     class Meta:

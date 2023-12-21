@@ -6,10 +6,15 @@ from rest_framework.response import Response
 from rest_framework import permissions, status
 from common.rest_utils import build_response
 from .models import UserloginExp,ClientContact,ClientExplabs,Location,Client
-from .serializers import ClientExplabsSerializer,LocationSerializer,LoginSerializer,ClientPkgSerializer
+from .serializers import ClientExplabsSerializer,LocationSerializer,LoginSerializer,ClientPkgSerializer,UserloginExpSerializer
 import requests
 import json
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+
 User = get_user_model()  
 
 
@@ -21,14 +26,34 @@ class UserRegistrationAPIView(APIView):
         email = data['email']
         email = email.lower()
         password = data['password']
-        client_contact_id = data['client_contact']
-        client_contact = ClientContact.objects.get(id=client_contact_id)
-        user = UserloginExp.objects.create_user(email=email, password=password,client_contact=client_contact)
-        return build_response(
-                status.HTTP_200_OK,
-                "Success",
-                data=user
+        cell_no = data['cell_no']
+        designation = data['designation']
+        imagex_client_id = data['imagex_client_id']
+        first_name = data['first_name']
+        last_name = data['last_name']
+        try:
+            if imagex_client_id:
+                client = Client.objects.get(id = imagex_client_id)
+            client_contact = ClientContact.objects.create(cell_no=cell_no,last_name=last_name,first_name=first_name,designation=designation,clientid=client,email=email)
+        except ClientContact.DoesNotExist:
+            return build_response(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                message="Error creating ClientContact",
+                data=None
             )
+            
+        user_model = get_user_model()
+        user = user_model.objects.create_user(email=email, password=password)
+        user.first_name = data.get('first_name', '')
+        user.last_name = data.get('last_name', '')
+        client_contact=client_contact,
+        user.save()
+        serializer = UserloginExpSerializer(user)
+        return build_response(
+            status.HTTP_200_OK,
+            "Success",
+            data=serializer.data
+        )
         
 class ClientExplabsAPIView(APIView):
     def get(self, request, *args, **kwargs):
@@ -169,3 +194,50 @@ class ClientPkgAPIView(APIView):
                 status.HTTP_404_NOT_FOUND,
                 "Invalid client  id",
             )
+            
+from rest_framework.permissions import AllowAny        
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    permission_classes = [AllowAny]
+    
+class LoginAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        try:
+            serializer = LoginSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            
+            email = serializer.validated_data['email']
+            password = serializer.validated_data['password']
+
+            user = authenticate(request, email=email, password=password)
+
+            if user:
+                refresh = RefreshToken.for_user(user)
+                access_token = str(refresh.access_token)
+                refresh_token = str(refresh)
+                data = {
+                    'access_token': access_token,
+                    'refresh_token': refresh_token,
+                }
+
+                return build_response(
+                    status.HTTP_200_OK,
+                    "Login Successfully",
+                    data = data
+                )
+            return build_response(
+                status.HTTP_404_NOT_FOUND,
+                "Failed",
+                data=None,
+                errors =  "Invalid credentials"
+            )
+
+        except Exception as e:
+            return build_response(
+                status.HTTP_400_BAD_REQUEST,
+                "Invalid credentials",
+            )
+       

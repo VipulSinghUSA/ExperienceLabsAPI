@@ -165,3 +165,13 @@ from rest_framework import serializers
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
+    
+    
+    
+
+class Country(models.Model):
+    name = models.TextField(blank=True, null=True)
+    code = models.TextField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'country'

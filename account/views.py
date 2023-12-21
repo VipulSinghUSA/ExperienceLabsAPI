@@ -5,8 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions, status
 from common.rest_utils import build_response
-from .models import UserloginExp,ClientContact,ClientExplabs,Location,Client
-from .serializers import ClientExplabsSerializer,LocationSerializer,LoginSerializer,ClientPkgSerializer,UserloginExpSerializer
+from .models import UserloginExp,ClientContact,ClientExplabs,Location,Client,Country
+from .serializers import ClientExplabsSerializer,LocationSerializer,LoginSerializer,ClientPkgSerializer,UserloginExpSerializer,CountrySerializer
 import requests
 import json
 from rest_framework.permissions import IsAuthenticated
@@ -240,4 +240,26 @@ class LoginAPIView(APIView):
                 status.HTTP_400_BAD_REQUEST,
                 "Invalid credentials",
             )
-       
+            
+
+
+class CountryAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            countries = Country.objects.all()
+            serializer = CountrySerializer(countries, many=True)
+            return build_response(
+                        status.HTTP_200_OK,
+                        "Login Successfully",
+                        data = serializer.data,
+                     
+                    )
+        except Exception as e:
+            return build_response(
+                status.HTTP_400_BAD_REQUEST,
+                "Failed",
+                data = None
+                
+                
+            )
+            

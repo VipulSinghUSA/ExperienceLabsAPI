@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
-from .models import ClientExplabs,Location,ClientContact,ClientPkg,UserloginExp
+from .models import ClientExplabs,Location,ClientContact,ClientPkg,UserloginExp,Country
 
 User = get_user_model()
 
@@ -33,3 +33,9 @@ class ClientPkgSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientPkg
         fields = '__all__'
+        
+        
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ['id', 'name', 'code']

@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions, status
 from common.rest_utils import build_response
-from .models import UserloginExp,ClientContact,ClientExplabs,Location,Client,Country,ClientPkg
+from .models import UserloginExp,ClientContact,ClientExplabs,Location,Client,Country,ClientPkg,ClientLocation
 from .serializers import ClientExplabsSerializer,LocationSerializer,LoginSerializer,ClientPkgSerializer,UserloginExpSerializer,CountrySerializer
 import requests
 import json
@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.views import TokenObtainPairView
-
+import uuid
 
 User = get_user_model()  
 
@@ -101,16 +101,19 @@ class LocationAPIView(APIView):
         data=json.dumps(payload)
 
         try:
+           
             response = requests.post(api_url, data=data, headers=headers)
             response.raise_for_status()
             data = response.json()
             client_id = data['client_id']
+            
             client = Client.objects.get(id=client_id)
-            location = Location.objects.create(
-                name=data.get('name'),
+            location = ClientLocation.objects.create(
+                loc_name=data.get('name'),
                 description=data.get('description'),
-                api_key=data.get('api_key'),
-                client=data.get('client'),
+                imagex_api_key=data.get('api_key'),
+                imagex_client_id=data.get('client'),
+                imagex_location_id = str(uuid.uuid4())
             )
             serializer = LocationSerializer(client)
             return build_response(

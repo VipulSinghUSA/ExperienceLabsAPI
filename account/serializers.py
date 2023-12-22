@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
-from .models import ClientExplabs,Location,ClientContact,ClientPkg,UserloginExp,Country
+from .models import ClientExplabs,Location,ClientContact,ClientPkg,UserloginExp,Country,ClientLocation
 
 User = get_user_model()
 
@@ -19,8 +19,8 @@ class ClientExplabsSerializer(serializers.ModelSerializer):
 
 class LocationSerializer(serializers.ModelSerializer):
   class Meta:
-        model = Location
-        fields = ('name', 'client','description','api_key')
+        model = ClientLocation
+        fields = ('description', 'imagex_client_id','imagex_location_id','imagex_api_key','loc_name')
         
         
 

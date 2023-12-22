@@ -120,7 +120,6 @@ class ClientExplabs(models.Model):
 
 
 class ClientLocation(models.Model):
-    id = models.IntegerField(primary_key=True)
     loc_name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     imagex_location_id = models.CharField(max_length=255, blank=True, null=True)

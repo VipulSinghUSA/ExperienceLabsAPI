@@ -1,19 +1,20 @@
-from django.shortcuts import render
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import get_user_model
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import permissions, status
-from common.rest_utils import build_response
-from .models import UserloginExp,ClientContact,ClientExplabs,Location,Client,Country,ClientPkg,ClientLocation
-from .serializers import ClientExplabsSerializer,LocationSerializer,LoginSerializer,ClientPkgSerializer,UserloginExpSerializer,CountrySerializer
-import requests
 import json
-from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth import authenticate
-from rest_framework.authtoken.models import Token
-from rest_framework_simplejwt.views import TokenObtainPairView
 import uuid
+
+import requests
+from common.rest_utils import build_response
+from django.contrib.auth import authenticate, get_user_model
+from django.shortcuts import render
+from rest_framework import permissions, status
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.permissions import AllowAny
+from .models import *
+from .serializers import *
 
 User = get_user_model()  
 
@@ -56,8 +57,8 @@ class UserRegistrationAPIView(APIView):
         )
         
 class ClientExplabsAPIView(APIView):
-    def get(self, request, *args, **kwargs):
-        api_url = 'https://dxmltpiz2ac2inuhad3au4ugqa0pbtqe.lambda-url.us-east-1.on.aws/admin/client'
+    def post(self, request,client_id, *args, **kwargs):
+        api_url = f'https://dxmltpiz2ac2inuhad3au4ugqa0pbtqe.lambda-url.us-east-1.on.aws/admin/location/{client_id}/'
         headers = {
             'accept': 'application/json',
             'x-api-key': '6221c617-1380-4912-88eb-ba737be2b8ce',
@@ -90,8 +91,8 @@ class ClientExplabsAPIView(APIView):
 
 
 class LocationAPIView(APIView):
-    def get(self, request, *args, **kwargs):
-        api_url = 'https://dxmltpiz2ac2inuhad3au4ugqa0pbtqe.lambda-url.us-east-1.on.aws/admin/location/f14a797b-55c0-423b-9122-11069e241ef3'
+    def post(self, request,client_id,*args, **kwargs):
+        api_url = f'https://dxmltpiz2ac2inuhad3au4ugqa0pbtqe.lambda-url.us-east-1.on.aws/admin/location/{client_id}/'
         headers = {
             'accept': 'application/json',
             'x-api-key': '6221c617-1380-4912-88eb-ba737be2b8ce',
@@ -126,59 +127,60 @@ class LocationAPIView(APIView):
             return Response({'error': f'Error updating clients: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         
-class UserLoginAPIView(APIView):
-    def post(self, request, *args, **kwargs):
-        serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data['email']
-        password = serializer.validated_data['password']
+# class UserLoginAPIView(APIView):
+#     def post(self, request, *args, **kwargs):
+#         serializer = LoginSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         email = serializer.validated_data['email']
+#         password = serializer.validated_data['password']
+        
+#         try:
 
-        try:
+#             user = UserloginExp.objects.get(email=email)
+          
+#             refresh = RefreshToken.for_user(user)
+#             client_contact_id = user.client_contact_id
 
-            user = UserloginExp.objects.using('default').get(email=email)
-            refresh = RefreshToken.for_user(user)
-            client_contact_id = user.client_contact_id
+#             client_contact = ClientContact.objects.using('default').get(id=client_contact_id)
+#             client = Client.objects.using('default').get(id=client_contact.clientid_id)
+#             if client:
+#                 client_data = {
+#                     'id': client.id,
+#                     'name': client.name,
+#                     'description': client.description,
+#                     'created_at': client.created_at,
+#                     'updated_at': client.updated_at,
 
-            client_contact = ClientContact.objects.using('default').get(id=client_contact_id)
-            client = Client.objects.using('default').get(id=client_contact.clientid_id)
-            if client:
-                client_data = {
-                    'id': client.id,
-                    'name': client.name,
-                    'description': client.description,
-                    'created_at': client.created_at,
-                    'updated_at': client.updated_at,
+#                 }
+#                 user_data = {
+#                     'id': user.id,
+#                     'email': user.email,
+#                     'active': user.active,
+#                     'lastlogin': user.lastlogin,
+#                     'ispwdchange': user.ispwdchange,
+#                     # Include other fields as needed
+#                 }
 
-                }
-                user_data = {
-                    'id': user.id,
-                    'email': user.email,
-                    'active': user.active,
-                    'lastlogin': user.lastlogin,
-                    'ispwdchange': user.ispwdchange,
-                    # Include other fields as needed
-                }
+#                 return build_response(
+#                     status.HTTP_200_OK,
+#                     "Success",
+#                     data={
+#                         'access_token': str(refresh.access_token),
+#                         'refresh_token': str(refresh),
+#                         'client_contact': client_data,
+#                         'user_data': user_data,
+#                     }
+#                 )
+#             return build_response(
+#                 status.HTTP_400_BAD_REQUEST,
+#                 "Client Id not found",
+#             )
 
-                return build_response(
-                    status.HTTP_200_OK,
-                    "Success",
-                    data={
-                        'access_token': str(refresh.access_token),
-                        'refresh_token': str(refresh),
-                        'client_contact': client_data,
-                        'user_data': user_data,
-                    }
-                )
-            return build_response(
-                status.HTTP_400_BAD_REQUEST,
-                "Client Id not found",
-            )
-
-        except UserloginExp.DoesNotExist:
-            return build_response(
-                status.HTTP_401_UNAUTHORIZED,
-                "Invalid credentials",
-            )
+#         except UserloginExp.DoesNotExist:
+#             return build_response(
+#                 status.HTTP_401_UNAUTHORIZED,
+#                 "Invalid credentials",
+#             )
 
 class ClientPkgAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -198,7 +200,6 @@ class ClientPkgAPIView(APIView):
                 "Invalid client  id",
             )
             
-from rest_framework.permissions import AllowAny        
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -216,21 +217,43 @@ class LoginAPIView(APIView):
             password = serializer.validated_data['password']
 
             user = authenticate(request, email=email, password=password)
+            client_contact_id = user.client_contact_id
 
             if user:
-                refresh = RefreshToken.for_user(user)
-                access_token = str(refresh.access_token)
-                refresh_token = str(refresh)
-                data = {
-                    'access_token': access_token,
-                    'refresh_token': refresh_token,
-                }
+                user = UserloginExp.objects.get(email=email)
+                client_contact = ClientContact.objects.using('default').get(id=client_contact_id)
+                client = Client.objects.using('default').get(id=client_contact.clientid_id)
+                if client:
+                    client_data = {
+                        'id': client.id,
+                        'name': client.name,
+                        'description': client.description,
+                        'created_at': client.created_at,
+                        'updated_at': client.updated_at,
 
-                return build_response(
-                    status.HTTP_200_OK,
-                    "Login Successfully",
-                    data = data
-                )
+                    }
+                    user_data = {
+                        'id': user.id,
+                        'email': user.email,
+                        'active': user.active,
+                        'lastlogin': user.lastlogin,
+                        'ispwdchange': user.ispwdchange,
+                    }
+                    refresh = RefreshToken.for_user(user)
+                    access_token = str(refresh.access_token)
+                    refresh_token = str(refresh)
+                    data = {
+                        'access_token': access_token,
+                        'refresh_token': refresh_token,
+                        "user_data" : user_data,
+                        "client_data":client_data
+                    }
+
+                    return build_response(
+                        status.HTTP_200_OK,
+                        "Login Successfully",
+                        data = data
+                    )
             return build_response(
                 status.HTTP_404_NOT_FOUND,
                 "Failed",
@@ -253,7 +276,7 @@ class CountryAPIView(APIView):
             serializer = CountrySerializer(countries, many=True)
             return build_response(
                         status.HTTP_200_OK,
-                        "Login Successfully",
+                        "Success",
                         data = serializer.data,
                      
                     )
@@ -262,7 +285,42 @@ class CountryAPIView(APIView):
                 status.HTTP_400_BAD_REQUEST,
                 "Failed",
                 data = None
-                
-                
             )
+            
+            
+class LocationListAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            client_location = ClientLocation.objects.all()
+            serializer = ClientLocationSerializer(client_location, many=True)
+            return build_response(
+                status.HTTP_200_OK,
+                "Success",
+                data=serializer.data,
+            )
+        except Exception as e:
+            return build_response(
+                status.HTTP_400_BAD_REQUEST,
+                "Failed",
+                data=None,
+            )
+            
+class UserProfileAPIView(APIView):
+    def get(self, request ,*args, **kwargs):
+        try:
+            user = request.user  
+            serializer = UserProfileSerializer(user)
+            return build_response(
+                status.HTTP_200_OK,
+                "Success",
+                data=serializer.data,
+            )
+            
+        except Exception as e:
+            return build_response(
+                status.HTTP_400_BAD_REQUEST,
+                "Failed",
+                data=None,
+            )
+            
             

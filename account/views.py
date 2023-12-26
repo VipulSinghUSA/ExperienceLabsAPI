@@ -288,22 +288,24 @@ class CountryAPIView(APIView):
             )
             
             
-class LocationListAPIView(APIView):
-    def get(self, request, *args, **kwargs):
-        try:
-            client_location = ClientLocation.objects.all()
-            serializer = ClientLocationSerializer(client_location, many=True)
-            return build_response(
-                status.HTTP_200_OK,
-                "Success",
-                data=serializer.data,
-            )
-        except Exception as e:
-            return build_response(
-                status.HTTP_400_BAD_REQUEST,
-                "Failed",
-                data=None,
-            )
+# class LocationListAPIView(APIView):
+#     def get(self, request, *args, **kwargs):
+#         breakpoint()
+#         try:
+            
+#             client_location = ClientLocation.objects.all()
+#             serializer = ClientLocationSerializer(client_location, many=True)
+#             return build_response(
+#                 status.HTTP_200_OK,
+#                 "Success",
+#                 data=serializer.data,
+#             )
+#         except Exception as e:
+#             return build_response(
+#                 status.HTTP_400_BAD_REQUEST,
+#                 "Failed",
+#                 data=None,
+#             )
             
 class UserProfileAPIView(APIView):
     def get(self, request ,*args, **kwargs):
@@ -323,4 +325,22 @@ class UserProfileAPIView(APIView):
                 data=None,
             )
             
+class LocationListAPIView(APIView):
+     def get(self, request ,*args, **kwargs):
+        try:
+            breakpoint()
+            client_location = ClientLocation.objects.all()
+            serializer = ClientLocationSerializer(client_location, many=True)
+            return build_response(
+                status.HTTP_200_OK,
+                "Success",
+                data=serializer.data,
+            )
             
+        except Exception as e:
+            return build_response(
+                status.HTTP_400_BAD_REQUEST,
+                "Failed",
+                data=None,
+            )
+    

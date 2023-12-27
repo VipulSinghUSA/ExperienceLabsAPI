@@ -114,7 +114,8 @@ class LocationAPIView(APIView):
                 description=data.get('description'),
                 imagex_api_key=data.get('api_key'),
                 imagex_client_id=data.get('client'),
-                imagex_location_id = str(uuid.uuid4())
+                imagex_location_id = str(uuid.uuid4()),
+                country_name =request.data.get('country_name')
             )
             serializer = LocationSerializer(client)
             return build_response(
@@ -328,7 +329,6 @@ class UserProfileAPIView(APIView):
 class LocationListAPIView(APIView):
      def get(self, request ,*args, **kwargs):
         try:
-            breakpoint()
             client_location = ClientLocation.objects.all()
             serializer = ClientLocationSerializer(client_location, many=True)
             return build_response(

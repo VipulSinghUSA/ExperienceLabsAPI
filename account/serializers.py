@@ -20,7 +20,7 @@ class ClientExplabsSerializer(serializers.ModelSerializer):
 class LocationSerializer(serializers.ModelSerializer):
   class Meta:
         model = ClientLocation
-        fields = ('description', 'imagex_client_id','imagex_location_id','imagex_api_key','loc_name')
+        fields = ('description', 'imagex_client_id','imagex_location_id','imagex_api_key','loc_name',"country_name")
         
         
 
@@ -43,7 +43,7 @@ class CountrySerializer(serializers.ModelSerializer):
 class ClientLocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientLocation
-        fields =  ["id","loc_name","description","imagex_location_id","imagex_client_id","imagex_api_key"]
+        fields =  ["id","loc_name","description","imagex_location_id","imagex_client_id","imagex_api_key","country_name"]
         
         
 class ClientContactSerializer(serializers.ModelSerializer):

@@ -152,6 +152,106 @@ class RecordLocationByClientId(APIView):
 #             )
 
 
+# class RemoveBackgroundAPIView(APIView):
+#     parser_classes = (MultiPartParser, FormParser)
+
+#     def post(self, request, *args, **kwargs):
+#         image_file = request.FILES.get('image', None)
+
+#         if image_file:
+#             data = request.data
+#             temp_file_path = default_storage.save('temp_image.jpg', image_file)
+#             temp_file_path = os.path.join('media', temp_file_path)
+
+#             image_file.seek(0)
+#             image_content = image_file.read()
+#             config = json.loads(image_content)
+
+#             input_folder = config["inputfolder"]
+#             ouput_folder = config["outputfolder"]
+#             temp_folder = config["tempfolder"]
+
+#             url = 'https://api.pixian.ai/api/v2/remove-background'
+#             auth = ('px7cjqhnn9qvelj', 'd11tt5p1s38rqf025shq9j2fljb1a94fntcktubm8b0jcb7853v2')
+
+#             for image in os.scandir(input_folder):
+#                 response = requests.post(url, files={'image': open(image.path, 'rb')},
+#                                          data=config,
+#                                          auth=auth)
+#                 if response.status_code == requests.codes.ok:
+#                     try:
+#                         location_instance = Location.objects.get(id=data.get('location'))
+#                         client_identifier = data.get('client')
+#                         client_instance = Client.objects.get(id=client_identifier)
+#                     except Location.DoesNotExist:
+#                         return build_response(
+#                             status.HTTP_400_BAD_REQUEST,
+#                             "Location does not exist",
+#                             data=None,
+#                         )
+#                     except Client.DoesNotExist:
+#                         return build_response(
+#                             status.HTTP_400_BAD_REQUEST,
+#                             "Client does not exist",
+#                             data=None,
+#                         )
+
+#                     if location_instance and client_instance:
+#                         accounting_instance = Accounting.objects.create(
+#                             client=client_instance,
+#                             location=location_instance,
+#                             status=True,
+#                             error=None,
+#                             ort_session_time=0.25,
+#                             matting_time=0.25,
+#                             main_operation_time=0.25,
+#                             image_download_time=0.25
+#                         )
+
+#                         output_file_path = os.path.join(ouput_folder, image.name)
+#                         with open(output_file_path, 'wb') as out:
+#                             out.write(response.content)
+
+#                         temp_file_path = os.path.join(temp_folder, image.name)
+#                         with open(temp_file_path, 'wb') as out:
+#                             out.write(response.content)
+
+#                         serializer = AccountingSerializer(accounting_instance)
+
+#                         # Return the final response outside the loop
+#                         return build_response(
+#                             status.HTTP_200_OK,
+#                             "Image processed successfully",
+#                             data=serializer.data,
+#                         )
+#                     else:
+#                         return build_response(
+#                             status.HTTP_400_BAD_REQUEST,
+#                             "Location or client is not valid",
+#                             data=None,
+#                         )
+#                 else:
+#                     return build_response(
+#                         status.HTTP_400_BAD_REQUEST,
+#                         f"Failed: {response.status_code} {response.text}",
+#                         data=None,
+#                     )
+
+#             # If the loop completes without returning, return an appropriate response
+#             return build_response(
+#                 status.HTTP_400_BAD_REQUEST,
+#                 "No valid images processed",
+#                 data=None,
+#             )
+#         else:
+#             return build_response(
+#                 status.HTTP_400_BAD_REQUEST,
+#                 "No image file provided",
+#                 data=None,
+#             )
+
+
+
 class RemoveBackgroundAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -168,11 +268,13 @@ class RemoveBackgroundAPIView(APIView):
             config = json.loads(image_content)
 
             input_folder = config["inputfolder"]
-            ouput_folder = config["outputfolder"]
+            output_folder = config["outputfolder"]
             temp_folder = config["tempfolder"]
 
             url = 'https://api.pixian.ai/api/v2/remove-background'
             auth = ('px7cjqhnn9qvelj', 'd11tt5p1s38rqf025shq9j2fljb1a94fntcktubm8b0jcb7853v2')
+
+            processed_images = []
 
             for image in os.scandir(input_folder):
                 response = requests.post(url, files={'image': open(image.path, 'rb')},
@@ -208,7 +310,7 @@ class RemoveBackgroundAPIView(APIView):
                             image_download_time=0.25
                         )
 
-                        output_file_path = os.path.join(ouput_folder, image.name)
+                        output_file_path = os.path.join(output_folder, image.name)
                         with open(output_file_path, 'wb') as out:
                             out.write(response.content)
 
@@ -216,14 +318,13 @@ class RemoveBackgroundAPIView(APIView):
                         with open(temp_file_path, 'wb') as out:
                             out.write(response.content)
 
-                        serializer = AccountingSerializer(accounting_instance)
+                        # Collect information about processed image
+                        processed_images.append({
+                            "image_name": image.name,
+                            "output_path": output_file_path,
+                            "temp_path": temp_file_path
+                        })
 
-                        # Return the final response outside the loop
-                        return build_response(
-                            status.HTTP_200_OK,
-                            "Image processed successfully",
-                            data=serializer.data,
-                        )
                     else:
                         return build_response(
                             status.HTTP_400_BAD_REQUEST,
@@ -237,11 +338,11 @@ class RemoveBackgroundAPIView(APIView):
                         data=None,
                     )
 
-            # If the loop completes without returning, return an appropriate response
+            # If the loop completes without returning, return a response with processed images
             return build_response(
-                status.HTTP_400_BAD_REQUEST,
-                "No valid images processed",
-                data=None,
+                status.HTTP_200_OK,
+                "Images processed successfully",
+                data={"processed_images": processed_images},
             )
         else:
             return build_response(

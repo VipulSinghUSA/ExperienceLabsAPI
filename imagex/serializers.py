@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 
-from .models import Accounting
+from .models import Accounting,Location
 
 
 
@@ -12,6 +12,12 @@ class AccountingSerializer(serializers.ModelSerializer):
         model = Accounting
         fields = '__all__'
 
+
+class RecordLocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = '__all__'
+        
 
 # class UserRegistrationSerializer(serializers.ModelSerializer):
 #     class Meta:

@@ -4,32 +4,9 @@ import uuid
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         PermissionsMixin)
 from django.db import models
+from imagex.models import Client,Location
 
 
-class Client(models.Model):
-    id = models.CharField(primary_key=True, max_length=36)
-    name = models.CharField(max_length=128, blank=True, null=True)
-    description = models.CharField(max_length=255, blank=True, null=True)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        db_table = 'client'
-
-
-class Location(models.Model):
-    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
-    id = models.CharField(primary_key=True, max_length=36,auto_created=True)
-    client = models.ForeignKey(Client, models.DO_NOTHING)
-    name = models.CharField(max_length=128, blank=True, null=True)
-    description = models.CharField(max_length=255, blank=True, null=True)
-    api_key = models.CharField(max_length=64, blank=True, null=True)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        db_table = 'location'
         
         
 class ClientContact(models.Model):
@@ -170,3 +147,15 @@ class Country(models.Model):
 
     class Meta:
         db_table = 'country'
+        
+        
+
+
+class InVoice(models.Model):
+    name = models.CharField(max_length=255, blank=True, null=True)
+    file = models.FileField(upload_to='invoices/')
+    date = models.DateField(auto_now=True)
+
+
+    class Meta:
+        db_table = 'invoice'

@@ -13,7 +13,7 @@ urlpatterns = [
     path('client-packages/<str:client_id>/', ClientPkgAPIView.as_view(), name='client-packages'), 
     path('user/profile/', UserProfileAPIView.as_view(), name='client-packages'),
     path('list/location/', LocationListAPIView.as_view()),
- 
-    
-       
+    path('invoices/', InvoiceCreateView.as_view(), name='invoice-create'),
+
+   
 ]

@@ -343,4 +343,28 @@ class LocationListAPIView(APIView):
                 "Failed",
                 data=None,
             )
-    
+
+
+
+
+                
+
+class InvoiceCreateView(APIView):
+    def post(self, request, *args, **kwargs):
+        try:
+            serializer = InvoiceSerializer(data=request.data)
+
+            if serializer.is_valid():
+                serializer.save()
+                return build_response(
+                status.HTTP_200_OK,
+                "Success",
+                data=serializer.data,
+            )
+            
+        except Exception as e:
+            return build_response(
+                status.HTTP_400_BAD_REQUEST,
+                "Failed",
+                data=None,
+            )

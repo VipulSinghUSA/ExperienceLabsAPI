@@ -57,3 +57,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserloginExp
         fields = ['id', 'email', 'is_superuser', 'client_contact']
+        
+
+class InvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InVoice
+        fields = ['name','file']

@@ -223,7 +223,7 @@ class LoginAPIView(APIView):
             if user:
                 user = UserloginExp.objects.get(email=email)
                 client_contact = ClientContact.objects.using('default').get(id=client_contact_id)
-                client = Client.objects.using('default').get(id=client_contact.clientid_id)
+                client = Client.objects.get(id=client_contact.clientid_id)
                 if client:
                     client_data = {
                         'id': client.id,

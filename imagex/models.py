@@ -39,8 +39,8 @@ class Accounting(models.Model):
     matting_time = models.FloatField(blank=True, null=True)
     main_operation_time = models.FloatField(blank=True, null=True)
     image_download_time = models.FloatField(blank=True, null=True)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'accounting'
